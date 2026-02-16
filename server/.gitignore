@@ -1,0 +1,11 @@
+node_modules/
+.env
+*.log
+.DS_Store
+database.sqlite
+database.sqlite-journal
+database.sqlite-shm
+database.sqlite-wal
+coverage/
+.vscode/
+.idea/
