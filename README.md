@@ -300,7 +300,7 @@ cd server && npm start
 
 ## 👥 Autori
 - Progetto originale: JBudget JavaFX
-- Versione Web/Mobile: [Alessandro Mozzoni, Tommaso Ferretti, Mattia Farabollini, Alessandro Acciarresi]
+- Versione Web/Mobile: JBudget [Alessandro Mozzoni, Tommaso Ferretti, Mattia Farabollini, Alessandro Acciarresi]
 
 ## 📄 Licenza
 MIT License
