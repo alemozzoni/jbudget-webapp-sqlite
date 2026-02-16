@@ -117,7 +117,6 @@ Write-Host ""
 Write-Host "🌐 Apri il browser su: http://localhost:5173" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "📚 Guide utili:" -ForegroundColor White
-Write-Host "   - GUIDA_RAPIDA_SQLITE.md" -ForegroundColor Gray
 Write-Host "   - README.md" -ForegroundColor Gray
 Write-Host ""
 Write-Host "💡 Tips:" -ForegroundColor White
