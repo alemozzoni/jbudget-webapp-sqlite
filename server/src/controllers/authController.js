@@ -2,13 +2,30 @@ const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 const { validationResult } = require('express-validator');
 
-// Generate JWT Token
-const generateToken = (userId) => {
-  return jwt.sign(
-    { id: userId },
-    process.env.JWT_SECRET,
-    { expiresIn: '7d' }
-  );
+// Generate Access Token (breve durata)
+const generateAccessToken = (userId) => {
+    return jwt.sign(
+        { id: userId },
+        process.env.JWT_SECRET,
+        { expiresIn: '15m' }
+    );
+};
+
+// Generate Refresh Token (lunga durata)
+const generateRefreshToken = (userId) => {
+    return jwt.sign(
+        { id: userId },
+        process.env.JWT_REFRESH_SECRET,
+        { expiresIn: '7d' }
+    );
+};
+
+// Generate both tokens
+const generateTokens = (userId) => {
+    return {
+        accessToken: generateAccessToken(userId),
+        refreshToken: generateRefreshToken(userId)
+    };
 };
 
 // @route   POST /api/auth/register
@@ -42,14 +59,15 @@ exports.register = async (req, res) => {
       name
     });
 
-    // Generate token
-    const token = generateToken(user.id);
+    // Generate tokens
+    const { accessToken, refreshToken } = generateTokens(user.id);
 
     res.status(201).json({
       success: true,
       data: {
         user: user.toJSON(),
-        token
+        token: accessToken,
+        refreshToken
       }
     });
   } catch (error) {
@@ -94,14 +112,15 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Generate token
-    const token = generateToken(user.id);
+    // Generate tokens
+    const { accessToken, refreshToken } = generateTokens(user.id);
 
     res.json({
       success: true,
       data: {
         user: user.toJSON(),
-        token
+        token: accessToken,
+        refreshToken
       }
     });
   } catch (error) {
@@ -109,6 +128,60 @@ exports.login = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error during login'
+    });
+  }
+};
+
+// @route   POST /api/auth/refresh-token
+// @desc    Refresh access token using refresh token
+// @access  Public (ma richiede un refresh token valido)
+exports.refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'Refresh token is required'
+      });
+    }
+
+    // Verifica il refresh token
+    let decoded;
+    try {
+      decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    } catch (err) {
+      return res.status(401).json({
+        success: false,
+        message: 'Refresh token expired or invalid. Please login again.'
+      });
+    }
+
+    // Verifica che l'utente esista ancora
+    const user = await User.findByPk(decoded.id);
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Genera nuovi token (rotation: anche il refresh token viene rinnovato)
+    const newAccessToken = generateAccessToken(user.id);
+    const newRefreshToken = generateRefreshToken(user.id);
+
+    res.json({
+      success: true,
+      data: {
+        token: newAccessToken,
+        refreshToken: newRefreshToken
+      }
+    });
+  } catch (error) {
+    console.error('Refresh token error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during token refresh'
     });
   }
 };

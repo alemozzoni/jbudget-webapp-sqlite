@@ -32,6 +32,9 @@ router.post('/register', registerValidation, authController.register);
 // @route   POST /api/auth/login
 router.post('/login', loginValidation, authController.login);
 
+// @route   POST /api/auth/refresh-token
+router.post('/refresh-token', authController.refreshToken);
+
 // @route   GET /api/auth/me
 router.get('/me', auth, authController.getMe);
 
