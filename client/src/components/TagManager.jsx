@@ -134,18 +134,16 @@ const TagManager = ({ tags, onTagsChange }) => {
                   )}
                   <div className="tag-card-actions">
                     <button
-                      className="btn-icon"
+                      className="btn-action btn-edit"
                       onClick={() => handleOpenModal(tag)}
-                      title="Modifica"
                     >
-                      <Edit2 size={16} />
+                      <span>✏️ Modifica</span>
                     </button>
                     <button
-                      className="btn-icon btn-danger"
+                      className="btn-action btn-delete"
                       onClick={() => handleDelete(tag.id)}
-                      title="Elimina"
                     >
-                      <Trash2 size={16} />
+                      <span>🗑️ Elimina</span>
                     </button>
                   </div>
                 </div>
